@@ -34,7 +34,7 @@ io.on('connect', function(socket) {
   socket.on('loaded', function() { // we wait until the client has loaded and contacted us that it is ready to go.
 
     socket.emit('answer', "Hey, hello I am Bad Advisor a simple chat bot for giving terrible advice."); //We start with the introduction;
-    setTimeout(timedQuestion, 1000, socket, "What is your name?"); // Wait a moment and respond with a question.
+    setTimeout(timedQuestion, 4000, socket, "What is your name?"); // Wait a moment and respond with a question.
 
   });
   socket.on('message', (data) => { // If we get a new message from the client we process it;
@@ -54,7 +54,7 @@ function bot(data, socket, questionNum) {
  
   if (questionNum == 0) {
     answer = 'Hello ' + input + ' :-)'; // output response
-    waitTime = 1000;
+    waitTime = 4000;
     question = 'Can you describe your problem please?'; // load next question
 }
 else {
