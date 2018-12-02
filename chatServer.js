@@ -10,6 +10,9 @@ var http = require('http').Server(app); // connects http library to server
 var io = require('socket.io')(http); // connect websocket library to server
 var serverPort = 8000;
 
+const csvFilePath='advice.csv'
+const csv=require('csvtojson')
+
 
 //---------------------- WEBAPP SERVER SETUP ---------------------------------//
 // use express to create the simple webapp
@@ -30,8 +33,8 @@ io.on('connect', function(socket) {
   var questionNum = 0; // keep count of question, used for IF condition.
   socket.on('loaded', function() { // we wait until the client has loaded and contacted us that it is ready to go.
 
-    socket.emit('answer', "Hey, hello I am \"___*-\" a simple chat bot example."); //We start with the introduction;
-    setTimeout(timedQuestion, 5000, socket, "What is your name?"); // Wait a moment and respond with a question.
+    socket.emit('answer', "Hey, hello I am Bad Advisor a simple chat bot for giving terrible advice."); //We start with the introduction;
+    setTimeout(timedQuestion, 1000, socket, "What is your name?"); // Wait a moment and respond with a question.
 
   });
   socket.on('message', (data) => { // If we get a new message from the client we process it;
@@ -48,48 +51,88 @@ function bot(data, socket, questionNum) {
   var answer;
   var question;
   var waitTime;
-
-  /// These are the main statments that make up the conversation.
+ 
   if (questionNum == 0) {
     answer = 'Hello ' + input + ' :-)'; // output response
-    waitTime = 5000;
-    question = 'How old are you?'; // load next question
-  } else if (questionNum == 1) {
-    answer = 'Really, ' + input + ' years old? So that means you were born in: ' + (2018 - parseInt(input)); // output response
-    waitTime = 5000;
-    question = 'Where do you live?'; // load next question
-  } else if (questionNum == 2) {
-    answer = 'Cool! I have never been to ' + input + '.';
-    waitTime = 5000;
-    question = 'Whats your favorite color?'; // load next question
-  } else if (questionNum == 3) {
-    answer = 'Ok, ' + input + ' it is.';
-    socket.emit('changeBG', input.toLowerCase());
-    waitTime = 5000;
-    question = 'Can you still read the font?'; // load next question
-  } else if (questionNum == 4) {
-    if (input.toLowerCase() === 'yes' || input === 1) {
-      answer = 'Perfect!';
-      waitTime = 5000;
-      question = 'Whats your favorite place?';
-    } else if (input.toLowerCase() === 'no' || input === 0) {
-      socket.emit('changeFont', 'white'); /// we really should look up the inverse of what we said befor.
-      answer = ''
-      question = 'How about now?';
-      waitTime = 0;
-      questionNum--; // Here we go back in the question number this can end up in a loop
-    } else {
-      question = 'Can you still read the font?'; // load next question
-      answer = 'I did not understand you. Could you please answer "yes" or "no"?'
-      questionNum--;
-      waitTime = 5000;
-    }
-    // load next question
-  } else {
-    answer = 'I have nothing more to say!'; // output response
-    waitTime = 0;
-    question = '';
-  }
+    waitTime = 1000;
+    question = 'Can you describe your problem please?'; // load next question
+}
+else {
+    var i = Math.floor(Math.random() * 1931)
+    csv()
+  .fromFile(csvFilePath)
+  .then((jsonObj)=>{
+      // console.log(Object.keys(jsonObj));
+      for (var key in jsonObj) {
+            
+            if (key == i) {
+                answer = jsonObj[key]['text'];
+                waitTime = answer.length * 70;
+                question = 'Can you describe another problem please?';
+                
+                socket.emit('answer', answer);
+                setTimeout(timedQuestion, waitTime, socket, question);
+                return (questionNum);
+            }
+      }
+      
+      // console.log(jsonObj['field1']);
+      // console.log(i);
+      // if (parseInt(jsonObj['field1']) == i) {
+      //     answer = jsonObj['text']
+      //     console.log("HEREREs")
+      //     socket.emit('answer', answer);
+      //     setTimeout(timedQuestion, waitTime, socket, question);
+      //     return (questionNum);
+      // }
+  })
+}
+ 
+
+  
+  
+
+  /// These are the main statments that make up the conversation.
+  // if (questionNum == 0) {
+  //   answer = 'Hello ' + input + ' :-)'; // output response
+  //   waitTime = 5000;
+  //   question = 'How old are you?'; // load next question
+  // } else if (questionNum == 1) {
+  //   answer = 'Really, ' + input + ' years old? So that means you were born in: ' + (2018 - parseInt(input)); // output response
+  //   waitTime = 5000;
+  //   question = 'Where do you live?'; // load next question
+  // } else if (questionNum == 2) {
+  //   answer = 'Cool! I have never been to ' + input + '.';
+  //   waitTime = 5000;
+  //   question = 'Whats your favorite color?'; // load next question
+  // } else if (questionNum == 3) {
+  //   answer = 'Ok, ' + input + ' it is.';
+  //   socket.emit('changeBG', input.toLowerCase());
+  //   waitTime = 5000;
+  //   question = 'Can you still read the font?'; // load next question
+  // } else if (questionNum == 4) {
+  //   if (input.toLowerCase() === 'yes' || input === 1) {
+  //     answer = 'Perfect!';
+  //     waitTime = 5000;
+  //     question = 'Whats your favorite place?';
+  //   } else if (input.toLowerCase() === 'no' || input === 0) {
+  //     socket.emit('changeFont', 'white'); /// we really should look up the inverse of what we said befor.
+  //     answer = ''
+  //     question = 'How about now?';
+  //     waitTime = 0;
+  //     questionNum--; // Here we go back in the question number this can end up in a loop
+  //   } else {
+  //     question = 'Can you still read the font?'; // load next question
+  //     answer = 'I did not understand you. Could you please answer "yes" or "no"?'
+  //     questionNum--;
+  //     waitTime = 5000;
+  //   }
+  //   // load next question
+  // } else {
+  //   answer = 'I have nothing more to say!'; // output response
+  //   waitTime = 0;
+  //   question = '';
+  // }
 
 
   /// We take the changed data and distribute it across the required objects.

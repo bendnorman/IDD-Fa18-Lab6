@@ -10,6 +10,7 @@
   "author": "DaviGodicke, Nik Martelaro",
   "license": "MIT",
   "dependencies": {
+    "csvtojson": "^2.0.8",
     "express": "^4.16.2",
     "socket.io": "^2.0.4"
   }
